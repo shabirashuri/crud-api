@@ -8,25 +8,12 @@ import  bcrypt
 
 
 from pydantic import  BaseModel 
-
+from schema import User,Post
 
 
 app = FastAPI()
 
 models.Base.metadata.create_all(bind = engine)
-
-
-class Post(BaseModel):
-    title : str
-    content : str
-    user_id : int
-
-class User(BaseModel):
-    firstname : str
-    lastname : str
-    email : str
-    password : str
-
 
 
 def get_db():
