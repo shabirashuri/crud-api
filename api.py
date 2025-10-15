@@ -1,11 +1,13 @@
-from fastapi import FastAPI ,HTTPException,Depends,status # type: ignore
-from pydantic import BaseModel # type: ignore
+from fastapi import FastAPI ,HTTPException,Depends,status 
 from database import Sessionlocal,engine
 from typing import Annotated
 import models
 from sqlalchemy.orm import Session # type: ignore
 import json
 import  bcrypt
+
+
+from pydantic import  BaseModel 
 
 
 
