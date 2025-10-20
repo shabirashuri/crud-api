@@ -1,7 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends, status
 from typing import Annotated
 from sqlalchemy.orm import Session
-
 import models
 from schema import User , User_update
 from database import Sessionlocal

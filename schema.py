@@ -1,11 +1,9 @@
 from pydantic import BaseModel
 from typing import Optional
 
-class Post(BaseModel):
-    title : str
-    content : str
-    user_id : int
 
+
+# user schema
 class User(BaseModel):
     firstname : Optional[str] = None
     lastname :Optional[str] = None
@@ -18,3 +16,15 @@ class User_update(BaseModel):
     lastname : Optional[str] = None
     email : Optional[str] = None
     password : Optional[str] = None
+
+
+    # posts schema
+
+class Post(BaseModel):
+    title : Optional[str] = None
+    content : str
+    user_id : int
+
+class Update_post(BaseModel) :
+    title : Optional[str] = None
+    content : Optional[str] = None
