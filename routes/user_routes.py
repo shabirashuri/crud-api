@@ -4,7 +4,8 @@ from sqlalchemy.orm import Session
 import models
 from schema import User , User_update
 from database import Sessionlocal
-from password_utils import hash_password
+from utils.password_utils import hash_password
+from utils.jwt_utils import create_access_token
 
 router = APIRouter()
 
@@ -42,6 +43,11 @@ async def create_user(user: User, db: db_dependency):
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
+    print(db_user)
+    print(type(db_user))
+
+    token = create_access_token({"id" : db_user.id,
+                                 } , db_user.email)
 
     return {
         "msg": "User created successfully",
@@ -50,6 +56,7 @@ async def create_user(user: User, db: db_dependency):
             "firstname": db_user.firstname,
             "lastname": db_user.lastname,
             "email": db_user.email,
+            "JWT_token" : token
         },
     }
 

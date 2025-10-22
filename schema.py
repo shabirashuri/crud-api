@@ -23,7 +23,7 @@ class User_update(BaseModel):
 class Post(BaseModel):
     title : Optional[str] = None
     content : str
-    user_id : int
+    
 
 class Update_post(BaseModel) :
     title : Optional[str] = None
