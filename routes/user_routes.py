@@ -63,7 +63,7 @@ async def create_user(user: User, db: db_dependency):
 def login_user(login_data: login, db: db_dependency):
     user = db.query(models.User).filter(models.User.email == login_data.email).first()
     if not user:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+        raise HTTPException(status_code=401, detail="Invalid email")
 
     if not verify_password(login_data.password, user.password):  # ← bcrypt check
         raise HTTPException(status_code=401, detail="Invalid password")

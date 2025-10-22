@@ -51,7 +51,7 @@ def decode_access_token(token: str = Depends(oauth2_scheme)):
         return {"id":id,"email": user_email}
 
     except JWTError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token")
+        return None
     
 # decoded_token = decode_access_token(token)
 # print(decoded_token)
