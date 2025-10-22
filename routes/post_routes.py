@@ -27,7 +27,7 @@ async def create_post(
     db: db_dependency,
     current_user: dict = Depends(decode_access_token)
 ):
-    print(f"USER DATA: {current_user}")
+    # print(f"USER DATA: {current_user}")
 
     # Create a new post manually
     new_post = models.Post()
@@ -46,7 +46,8 @@ async def create_post(
         "msg": "Post added successfully",
         "post": {
             "title": new_post.title,
-            "content": new_post.content
+            "content": new_post.content,
+            "id" : new_post.id
         }
     }
 
@@ -69,7 +70,6 @@ def get_posts_by_user(
         "user": user.firstname,
         "posts": [{"title": post.title, "content": post.content} for post in user.posts]
     }
-
 
 
 @router.put("/{post_id}",status_code=status.HTTP_200_OK)

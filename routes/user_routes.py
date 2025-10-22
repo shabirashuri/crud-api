@@ -2,9 +2,9 @@ from fastapi import APIRouter, HTTPException, Depends, status
 from typing import Annotated
 from sqlalchemy.orm import Session
 import models
-from schema import User , User_update
+from schema import User , User_update ,login
 from database import Sessionlocal
-from utils.password_utils import hash_password
+from utils.password_utils import verify_password ,hash_password
 from utils.jwt_utils import create_access_token
 
 router = APIRouter()
@@ -12,7 +12,7 @@ router = APIRouter()
 # Dependency
 def get_db():
     db = Sessionlocal()
-    try:
+    try:   
         yield db
     finally:
         db.close()
@@ -26,7 +26,7 @@ async def get_users(db: db_dependency):
     return users
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("/register", status_code=status.HTTP_201_CREATED)
 async def create_user(user: User, db: db_dependency):
     db_user = models.User(**user.dict())
     user_exists = db.query(models.User).filter(models.User.email == db_user.email).first()
@@ -46,8 +46,6 @@ async def create_user(user: User, db: db_dependency):
     print(db_user)
     print(type(db_user))
 
-    token = create_access_token({"id" : db_user.id,
-                                 } , db_user.email)
 
     return {
         "msg": "User created successfully",
@@ -55,10 +53,27 @@ async def create_user(user: User, db: db_dependency):
             "id": db_user.id,
             "firstname": db_user.firstname,
             "lastname": db_user.lastname,
-            "email": db_user.email,
-            "JWT_token" : token
+            "email": db_user.email
         },
     }
+
+
+
+@router.post("/login")
+def login_user(login_data: login, db: db_dependency):
+    user = db.query(models.User).filter(models.User.email == login_data.email).first()
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    if not verify_password(login_data.password, user.password):  # ← bcrypt check
+        raise HTTPException(status_code=401, detail="Invalid password")
+
+    # Create token
+    access_token = create_access_token({"id" : user.id,
+                                 } , user.email)
+    return {"loged in as":user.firstname,"access_token": access_token, "token_type": "bearer"}
+
+
 
 
 @router.get("/{user_id}", status_code=status.HTTP_200_OK)
