@@ -23,6 +23,11 @@ class User_update(BaseModel):
     password : Optional[str] = None
 
 
+
+
+class TokenRefreshRequest(BaseModel):
+    refresh_token: str
+
     # posts schema
 
 class Post(BaseModel):

@@ -119,7 +119,7 @@ def delete_post(post_id :int ,
       if post.user_id != user_id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Not authorized to update this post"
+                detail="Not authorized to delete this post"
         )
       
       db.delete(post)

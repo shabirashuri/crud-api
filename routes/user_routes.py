@@ -1,11 +1,11 @@
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, HTTPException, Depends, status,Request
 from typing import Annotated
 from sqlalchemy.orm import Session
 import models
-from schema import User , User_update ,login
+from schema import User , User_update ,login ,TokenRefreshRequest
 from database import Sessionlocal
 from utils.password_utils import verify_password ,hash_password
-from utils.jwt_utils import create_access_token
+from utils.jwt_utils import create_access_token , create_refresh_token , decode_refresh_token
 
 router = APIRouter()
 
@@ -69,19 +69,65 @@ def login_user(login_data: login, db: db_dependency):
         raise HTTPException(status_code=401, detail="Invalid password")
 
     # Create token
-    access_token = create_access_token({"id" : user.id,
-                                 } , user.email)
-    return {"loged in as":user.firstname,"access_token": access_token, "token_type": "bearer"}
+    
+    access_token = create_access_token( {"id" : user.id } , user.email)
+    refresh_token = create_refresh_token( {"id" : user.id } , user.email)
+
+    return {"loged in as":user.firstname,
+            "access_token": access_token, 
+            "reefresh_token" : refresh_token,
+            "token_type": "bearer"}
 
 
 
 
-@router.get("/{user_id}", status_code=status.HTTP_200_OK)
-async def get_user(user_id: int, db: db_dependency):
-    user = db.query(models.User).filter(models.User.id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+# @router.get("/{user_id}", status_code=status.HTTP_200_OK)
+# async def get_user(user_id: int, db: db_dependency):
+#     user = db.query(models.User).filter(models.User.id == user_id).first()
+#     if not user:
+#         raise HTTPException(status_code=404, detail="User not found")
+#     return user
+
+
+
+@router.get("/me")
+def get_current_user(request: Request, db: db_dependency):
+    user_data = request.state.user
+    user = db.query(models.User).filter(models.User.id == user_data["id"]).first()
     return user
+
+
+
+
+@router.post("/refresh", status_code=status.HTTP_200_OK)
+def refresh_access_token(request: TokenRefreshRequest):
+    refresh_token = request.refresh_token
+
+    payload = decode_refresh_token(refresh_token)
+
+    if not payload:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired refresh token"
+        )
+
+    user_id = payload.get("id")
+    email = payload.get("email")
+
+    if not user_id or not email:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid refresh token payload"
+        )
+
+    new_access_token = create_access_token({"id": user_id}, email)
+
+    return {
+        "new_access_token": new_access_token,
+        "token_type": "bearer"
+    }
+
+
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_200_OK)
