@@ -7,6 +7,10 @@ class login(BaseModel):
     password : str
 
 
+class TokenRefreshRequest(BaseModel):
+    refresh_token: str
+
+
 
 # user schema
 class User(BaseModel):
@@ -24,10 +28,6 @@ class User_update(BaseModel):
 
 
 
-
-class TokenRefreshRequest(BaseModel):
-    refresh_token: str
-
     # posts schema
 
 class Post(BaseModel):
@@ -38,3 +38,21 @@ class Post(BaseModel):
 class Update_post(BaseModel) :
     title : Optional[str] = None
     content : Optional[str] = None
+
+
+# comments schema
+
+
+class Comment(BaseModel):
+    content: str
+
+class CommentCreate(Comment):
+    pass
+
+class CommentResponse(Comment):
+    id: int
+    user_id: int
+    post_id: int
+
+    class Config:
+        orm_mode = True

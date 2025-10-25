@@ -5,16 +5,17 @@ import models
 from database import engine
 from routes import  user_routes 
 from routes import post_routes 
+from routes import comment_routes
 
 app = FastAPI()
 
 models.Base.metadata.create_all(bind = engine)
 
-# ✅ JWT Middleware
+# JWT Middleware
 @app.middleware("http")
 async def jwt_auth_middleware(request: Request, call_next):
     # Public routes that should skip authentication
-    public_paths = ["/user/login", "/user/register", "/docs", "/openapi.json"]
+    public_paths = ["/post/search","/user/login", "/user/register", "/docs", "/openapi.json"]
 
     # Allow public routes
     if any(request.url.path.startswith(path) for path in public_paths):
@@ -39,6 +40,7 @@ async def jwt_auth_middleware(request: Request, call_next):
 # Include routes
 app.include_router(user_routes.router, prefix="/user", tags=["User"])
 app.include_router(post_routes.router, prefix="/post", tags=["Post"]) 
+app.include_router(comment_routes.router, prefix="/comments", tags=["omments"]) 
 
 
 

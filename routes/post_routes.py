@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends, status
 from typing import Annotated
 from sqlalchemy.orm import Session
 import models
-
+from sqlalchemy import select
 from database import Sessionlocal
 from schema import Post , Update_post
 
@@ -130,5 +130,62 @@ def delete_post(post_id :int ,
 
 
     
+# @router.get("/search")
+# def get_posts(
+#     db: Session = Depends(get_db),
+#     search: str = None,     # search term
+#     skip: int = 0,           #  For pagination (start point)
+#     limit: int = 10          #  For pagination (number of results)
+# ):
+#     # Start a query
+#     query = db.query(models.Post)
+
+#     #  Apply search filter if search term exists
+#     if search:
+#         query = query.filter(models.Post.title.ilike(f"%{search}%"))  # 🔍 case-insensitive match
+
+#     #  Apply pagination (skip/limit)
+#     posts = query.offset(skip).limit(limit).all()
+
+#     # Return final results
+#     return {"title" : posts.title}
+
+
+
+
+@router.get("/search")
+def search_posts(
+    db: Session = Depends(get_db),
+    search: str = None,
+    skip: int = 0,
+    limit: int = 10
+):
+     
+    statment = (
+        select(
+            models.User.firstname,  
+            models.Post.title,       
+            models.Post.content      
+        )
+        .join(models.User, models.User.id == models.Post.user_id)  
+    )
 
     
+    if search:
+        statment = statment.where(models.Post.title.ilike(f"%{search}%"))
+
+    
+    statment= statment.offset(skip).limit(limit)
+
+    
+    results = db.execute(statment).all()
+
+    
+    return [
+        {
+            "user name": row.firstname,
+            "title": row.title,
+            "content": row.content
+        }
+        for row in results
+    ]

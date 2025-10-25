@@ -15,9 +15,8 @@ REFRESH_SECRET_KEY = os.getenv("REFRESH_SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES")
 REFRESH_TOKEN_EXPIRE_DAYS = os.getenv("REFRESH_TOKEN_EXPIRE_DAYS")
-# -------------------------------
+
 # Create a JWT access token
-# -------------------------------
 
 def create_access_token(data: dict, email: str):
     to_encode = data.copy()
@@ -47,9 +46,9 @@ def create_refresh_token(data: dict,email: str):
     return encoded_jwt
 
 
-# -------------------------------
+
 # Verify and decode a JWT token
-# -------------------------------
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
@@ -85,5 +84,6 @@ def decode_refresh_token(refresh_token: str):
         return {"id": id, "email": user_email}
     except JWTError:
         return None
+    
 # decoded_token = decode_access_token(token)
 # print(decoded_token)
