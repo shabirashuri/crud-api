@@ -56,3 +56,18 @@ class CommentResponse(Comment):
 
     class Config:
         orm_mode = True
+
+
+#   likes schema
+
+class LikeBase(BaseModel):
+    post_id: int
+
+class LikeResponse(BaseModel):
+    id: int
+    user_id: int
+    post_id: int
+
+
+    class Config:
+        orm_mode = True

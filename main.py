@@ -5,7 +5,7 @@ import models
 from database import engine
 from routes import  user_routes 
 from routes import post_routes 
-from routes import comment_routes
+from routes import comment_routes , like_routes
 
 app = FastAPI()
 
@@ -41,6 +41,7 @@ async def jwt_auth_middleware(request: Request, call_next):
 app.include_router(user_routes.router, prefix="/user", tags=["User"])
 app.include_router(post_routes.router, prefix="/post", tags=["Post"]) 
 app.include_router(comment_routes.router, prefix="/comments", tags=["omments"]) 
+app.include_router(like_routes.router,prefix="/likes", tags=["Likes"]) 
 
 
 
