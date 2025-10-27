@@ -19,7 +19,7 @@ db_dependency = Annotated[Session, Depends(get_db)]
 
 # Create a Comment
 
-@router.post("/post/{post_id}", status_code=status.HTTP_201_CREATED)
+@router.post("/{post_id}", status_code=status.HTTP_201_CREATED)
 def create_comment(
     post_id: int,
     comment: schema.CommentCreate,
@@ -43,7 +43,7 @@ def create_comment(
 
 # Get all comments for a post
 
-@router.get("/posts/{post_id}", response_model=list[schema.CommentResponse])
+@router.get("/{post_id}", response_model=list[schema.CommentResponse])
 def get_comments_for_post(post_id: int, db: db_dependency):
     comments = db.query(models.Comment).filter(models.Comment.post_id == post_id).all()
     return comments

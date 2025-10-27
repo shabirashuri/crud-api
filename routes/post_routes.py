@@ -68,7 +68,7 @@ def get_posts_by_user(
    
     return {
         "user": user.firstname,
-        "posts": [{"title": post.title, "content": post.content} for post in user.posts]
+        "posts": [{"id" : post.id,"title": post.title, "content": post.content} for post in user.posts]
     }
 
 

@@ -129,7 +129,6 @@ def refresh_access_token(request: TokenRefreshRequest):
 
 
 
-
 @router.delete("/{user_id}", status_code=status.HTTP_200_OK)
 async def delete_user(user_id: int, db: db_dependency):
     user = db.query(models.User).filter(models.User.id == user_id).first()

@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from utils.jwt_utils import decode_access_token
 import models
 from database import engine
-from routes import  user_routes 
+from routes import  user_routes , reset_password_routes
 from routes import post_routes 
 from routes import comment_routes , like_routes
 
@@ -15,7 +15,7 @@ models.Base.metadata.create_all(bind = engine)
 @app.middleware("http")
 async def jwt_auth_middleware(request: Request, call_next):
     # Public routes that should skip authentication
-    public_paths = ["/post/search","/user/login", "/user/register", "/docs", "/openapi.json"]
+    public_paths = ["/password","/post/search","/user/login", "/user/register", "/docs", "/openapi.json"]
 
     # Allow public routes
     if any(request.url.path.startswith(path) for path in public_paths):
@@ -40,9 +40,9 @@ async def jwt_auth_middleware(request: Request, call_next):
 # Include routes
 app.include_router(user_routes.router, prefix="/user", tags=["User"])
 app.include_router(post_routes.router, prefix="/post", tags=["Post"]) 
-app.include_router(comment_routes.router, prefix="/comments", tags=["omments"]) 
+app.include_router(comment_routes.router, prefix="/comments", tags=["comments"]) 
 app.include_router(like_routes.router,prefix="/likes", tags=["Likes"]) 
-
+app.include_router(reset_password_routes.router,prefix="/password",tags="Authentication")
 
 
 

@@ -54,8 +54,7 @@ class CommentResponse(Comment):
     user_id: int
     post_id: int
 
-    class Config:
-        orm_mode = True
+    
 
 
 #   likes schema
@@ -69,5 +68,12 @@ class LikeResponse(BaseModel):
     post_id: int
 
 
-    class Config:
-        orm_mode = True
+
+
+class Forgotpassword(BaseModel):
+    email : str
+
+
+class Resetpassword(BaseModel) :
+    token : str
+    new_password : str
