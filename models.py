@@ -28,8 +28,8 @@ class Post(Base):
 
     # Relationships
     user = relationship("User", back_populates="posts")
-    comments = relationship("Comment", back_populates="post")  # ✅ fixed
-    likes = relationship("Like", back_populates="post")        # ✅ fixed
+    comments = relationship("Comment", back_populates="post")  
+    likes = relationship("Like", back_populates="post")        
 
 class Comment(Base):
     __tablename__ = "comments"
@@ -41,7 +41,7 @@ class Comment(Base):
 
     # Relationships
     user = relationship("User", back_populates="comments")
-    post = relationship("Post", back_populates="comments")  # ✅ fixed
+    post = relationship("Post", back_populates="comments") 
 
 
 class Like(Base):
@@ -53,7 +53,22 @@ class Like(Base):
 
     # Relationships
     user = relationship("User", back_populates="likes")
-    post = relationship("Post", back_populates="likes")  # ✅ fixed
+    post = relationship("Post", back_populates="likes")  
 
     # Prevent duplicate likes by same user on same post
     __table_args__ = (UniqueConstraint("user_id", "post_id", name="_user_post_uc"),)
+
+from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from database import Base
+from datetime import datetime, timedelta
+
+class PasswordReset(Base):
+    __tablename__ = "password_resets"
+
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String(100), index=True, nullable=False)
+    otp_hash = Column(String(400), nullable=False)
+    expires_at = Column(DateTime, nullable=False)
+    verified = Column(Boolean, default=False)
+
+

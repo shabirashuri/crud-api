@@ -22,7 +22,7 @@ def get_db():
 
 db_dependency = Annotated[Session, Depends(get_db)]
 
-
+ 
 @router.post("/forgot-password")
 def forgot_password(request : Forgotpassword , db: db_dependency):
     user = db.query(User).filter(User.email == request.email).first()

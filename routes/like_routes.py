@@ -32,7 +32,7 @@ def like_post(
 
     # Check if already liked
     existing_like = db.query(models.Like).filter_by(user_id=user_id, post_id=post_id).first()
-    if existing_like:
+    if existing_like:                               
         raise HTTPException(status_code=400, detail="You already liked this post")
 
     new_like = models.Like(user_id=user_id, post_id=post_id)

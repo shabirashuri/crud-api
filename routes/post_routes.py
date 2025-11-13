@@ -93,7 +93,7 @@ def update_post( post_id:int,
         )
 
     if updated_post.title is not None:
-        post.title = updated_post.title
+        post.title = updated_post.tilte
     if updated_post.content is not None:
         post.content = updated_post.content
 
