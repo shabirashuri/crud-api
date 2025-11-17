@@ -70,8 +70,8 @@ def login_user(login_data: login, db: db_dependency):
 
     # Create token
     
-    access_token = create_access_token( {"id" : user.id } , user.email)
-    refresh_token = create_refresh_token( {"id" : user.id } , user.email)
+    access_token = create_access_token( {"id" : user.id , "role" : user.role } , user.email)
+    refresh_token = create_refresh_token( {"id" : user.id ,"role" : user.role} , user.email)
 
     return {"loged in as":user.firstname,
             "access_token": access_token, 

@@ -20,7 +20,7 @@ REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", 7))
 
 # Create a JWT access token
 
-def create_access_token(data: dict, email: str):
+def create_access_token(data: dict, email: str ):
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 
@@ -59,10 +59,11 @@ def decode_access_token(token: str = Depends(oauth2_scheme)):
         # Decode the token
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         id  = payload.get("id")
-        user_email: str = payload.get("email")  # "sub" usually stores the user identifier
+        user_email: str = payload.get("email")
+        user_role : str = payload.get("role") # "sub" usually stores the user identifier
         if user_email is None:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
-        return {"id":id,"email": user_email}
+        return {"id":id,"email": user_email,}
 
     except JWTError:
         return None

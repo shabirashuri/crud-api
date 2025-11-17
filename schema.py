@@ -1,5 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel , constr , EmailStr
 from typing import Optional
+from sqlalchemy import DateTime
 
 # login
 class login(BaseModel):
@@ -77,3 +78,13 @@ class Forgotpassword(BaseModel):
 class Resetpassword(BaseModel) :
     token : str
     new_password : str
+
+
+class PasswordResetRequest(BaseModel):
+    email: EmailStr
+
+class PasswordResetConfirm(BaseModel):
+    token: str
+    user_id: int
+    new_password: str
+

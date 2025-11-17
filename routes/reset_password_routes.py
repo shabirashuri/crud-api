@@ -5,9 +5,10 @@ from jose import jwt
 from database import Sessionlocal
 from typing import Annotated
 from models import User
-from schema import Forgotpassword ,Resetpassword
+from schema import Forgotpassword, Resetpassword
 from utils.password_utils import hash_password
-from utils.jwt_utils import SECRET_KEY, ALGORITHM  # use same constants as login/register
+from utils.jwt_utils import SECRET_KEY, ALGORITHM
+from utils.email_utils import send_email  
 
 
 router = APIRouter()
@@ -15,16 +16,17 @@ router = APIRouter()
 
 def get_db():
     db = Sessionlocal()
-    try:   
+    try:
         yield db
     finally:
         db.close()
 
 db_dependency = Annotated[Session, Depends(get_db)]
 
- 
+
+# Send reset token by email
 @router.post("/forgot-password")
-def forgot_password(request : Forgotpassword , db: db_dependency):
+def forgot_password(request: Forgotpassword, db: db_dependency):
     user = db.query(User).filter(User.email == request.email).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -37,17 +39,29 @@ def forgot_password(request : Forgotpassword , db: db_dependency):
         algorithm=ALGORITHM
     )
 
-    # For now, return the token (in real app you’d email it)
-    return {"reset_token": reset_token, 
-            "message": "Use this token to reset your password"}
+    # Create the email message
+    message = f"""
+    Hello {user.email},
+
+    You requested to reset your password.
+
+    Use this reset token (valid for 15 minutes):
+
+    {reset_token}
+
+    """
+    # Send the email
+    send_email(user.email, "Password Reset Request", message)
+
+    return {"message": "Password reset email sent. Check your inbox."}
 
 
 
+# reset the password using token
 @router.post("/reset-password")
-def reset_password(request: Resetpassword, db: Session = Depends(get_db)):
+def reset_password(request: Resetpassword, db: db_dependency):
 
     try:
-       
         payload = jwt.decode(request.token, SECRET_KEY, algorithms=[ALGORITHM])
 
         if payload.get("type") != "password_reset":
@@ -59,17 +73,16 @@ def reset_password(request: Resetpassword, db: Session = Depends(get_db)):
 
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=400, detail="Reset token expired")
-    except jwt.InvalidTokenError:
+    except jwt.JWTError:
         raise HTTPException(status_code=400, detail="Invalid token")
 
-    
+    # Find user from decoded email
     user = db.query(User).filter(User.email == email).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    
+    # Update password
     user.password = hash_password(request.new_password)
-
     db.commit()
 
     return {"message": "Password reset successfully"}
